@@ -267,7 +267,7 @@
                     </div>
                     <div class="row p-2">
                         <label class="font-weight-bold">
-                            What was the involved employee doing before the incident? <small>(explain below)</small>
+                            What was the  involved employee doing before the incident? <small>(explain below)</small>
                         </label>
                         <textarea class="form-control" id="employeeBefore" name="employeeBefore" value="" rows="3">{{ old('employeeBefore', $formdata ? $formdata->employeeBefore : '') }}</textarea>
                     </div>
