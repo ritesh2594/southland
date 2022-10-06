@@ -2,14 +2,14 @@
 <html lang="en">
 
 <head>
-    @include('partial.head')
+    @include('admin.partial.head')
     <title>AdminLTE 3 | Dashboard</title>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
-        @include('partial.navbar')
-        @include('partial.sidebar')
+        @include('admin.partial.navbar')
+        @include('admin.partial.sidebar')
         <div class="content-wrapper">
             <div class="content-header">
                 <div class="container-fluid">
@@ -85,8 +85,8 @@
                 </div>
             </section>
         </div>
-        @include('partial.footer')
+        @include('admin.partial.footer')
     </div>
-    @include('partial.foot')
+    @include('admin.partial.foot')
 </body>
 </html>

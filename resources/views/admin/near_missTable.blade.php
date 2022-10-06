@@ -2,14 +2,14 @@
 <html lang="en">
 
 <head>
-    @include('partial.head')
+    @include('admin.partial.head')
     <title>Near Miss</title>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
-        @include('partial.navbar')
-        @include('partial.sidebar')
+        @include('admin.partial.navbar')
+        @include('admin.partial.sidebar')
         <div class="content-wrapper">
             <div class="content-header">
                 <div class="container-fluid">
@@ -104,8 +104,8 @@
                                             <td>{{ $data->jobTitle }}</td>
                                             <td>{{ $data->supervisorName }}</td>
                                             <td class="text-center">
-                                                <a href="#" class="badge badge-primary"><i
-                                                        class='fas fa-edit'></i>
+                                                <a href="{{ route('near_missEdit', $data->id) }}"
+                                                    class="badge badge-primary"><i class='fas fa-edit'></i>
                                                     Edit</a>
                                                 <a href="#" class="badge badge-success"><i
                                                         class="far fa-file-pdf"></i> Export Pdf</a>
@@ -122,9 +122,9 @@
                 </div>
             </section>
         </div>
-        @include('partial.footer')
+        @include('admin.partial.footer')
     </div>
-    @include('partial.foot')
+    @include('admin.partial.foot')
 </body>
 <script type="text/javascript">
     $('.delete').click(function(e) {

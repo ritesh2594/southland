@@ -18,6 +18,19 @@ class DashboardController extends Controller
         $datas = employeeRecord::all();
         return view('admin.near_missTable', ['datas' => $datas]);
     }
+
+    public function edit($id)
+    {
+        $formdata = null;
+        if ($id) {
+            $formdata = employeeRecord::find($id);
+            // dd($formdata);   
+            // $likedJobs = JsaForm::where('job_type_id', $job->job_type_id)->where('id', '<>', $id)->orderBy('id', 'DESC')->get();
+            // return view('dashboard.jobs.job-details', ['job' => $job, 'likedJobs' => $likedJobs]);
+            return view('admin.near-missEdit', ['formdata' => $formdata]);
+        }
+        abort(404);
+    }
     public function destroy($id)
     {
         if ($id) {
