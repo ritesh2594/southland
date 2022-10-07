@@ -3,6 +3,7 @@
 
 <head>
     @include('admin.partial.head')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Near Miss</title>
 </head>
 
@@ -48,7 +49,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div id="" style="width: 100%;">
-                                        <form id="searchform" method="POST">
+                                        <form id="searchMiss">
                                             <div class="form-row">
                                                 <div class="form-group col-md-4">
                                                     <label><b>Employee Name:</b></label>
@@ -64,12 +65,11 @@
                                                 </div>
                                             </div>
                                             <div class="text-right">
-                                                <button type="rest" class="btn btn-warning btn text-white"
-                                                    name="searchCloseUser" id="searchClosebtnUser">Cancel
-                                                </button>
-                                                <input type="hidden" name="searchField">
-                                                <button type="button" class="btn btn-primary btn" id="searchbtn"
-                                                    name="searchField">Search
+                                                <a class="btn btn-danger"
+                                                    href="{{ route('near_missTable') }}">Cancel</a>
+                                                <input type="hidden" name="search" value="search">
+                                                <button type="button" class="btn btn-primary btn" id="searchbtnMiss"
+                                                    name="search">Search
                                                     <span class="spinner-border spinner-border-sm text-light"
                                                         id="spinnerSearch"></span>
                                                 </button>
@@ -91,10 +91,11 @@
                                         <th scope="col">Department</th>
                                         <th scope="col">Job Title</th>
                                         <th scope="col">Supervisor Name</th>
+                                        <th scope="col">Date</th>
                                         <th scope="col" class="text-center">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="ajax-alert">
                                     @foreach ($datas as $data)
                                         <tr>
                                             <th scope="row">{{ $data->id }}</th>
@@ -103,6 +104,7 @@
                                             <td>{{ $data->department }}</td>
                                             <td>{{ $data->jobTitle }}</td>
                                             <td>{{ $data->supervisorName }}</td>
+                                            <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>
                                             <td class="text-center">
                                                 <a href="{{ route('near_missEdit', $data->id) }}"
                                                     class="badge badge-primary"><i class='fas fa-edit'></i>
@@ -117,6 +119,9 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                            <div class="pagination">
+                                {!! $datas->appends(\Request::except('page'))->render() !!}
+                            </div>
                         </section>
                     </div>
                 </div>
@@ -131,6 +136,37 @@
         if (!confirm('Are you sure you want to delete this?')) {
             e.preventDefault();
         }
+    });
+</script>
+<script>
+    $('#spinnerSearch').hide();
+    $(document).ready(function() {
+        $("#searchbtnMiss").click(function() {
+            var forms = $("#searchMiss");
+            var url = "{{ route('near_missTable') }}";
+            $.ajax({
+                type: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url: url,
+                data: forms.serialize(),
+                beforeSend: function() {
+                    $('#searchbtnMiss').addClass('disabled');
+                    $("#spinnerSearch").show();
+                },
+                success: function(data) {
+                    if (data.html !== null) {
+                            $('#ajax-alert').empty();
+                            $('#ajax-alert').append(data.html);
+                        }
+                },
+                complete: function() {
+                    $('#searchbtnMiss').removeClass('disabled');
+                    $("#spinnerSearch").hide();
+                }
+            });
+        });
     });
 </script>
 

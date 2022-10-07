@@ -13,11 +13,7 @@ class DashboardController extends Controller
     {
         return view('admin.index');
     }
-    public function listNearMiss()
-    {
-        $datas = employeeRecord::all();
-        return view('admin.near_missTable', ['datas' => $datas]);
-    }
+
 
     public function edit($id)
     {
@@ -49,5 +45,40 @@ class DashboardController extends Controller
                 return redirect()->back()->withErrors(['Something went wrong']);
             }
         }
+    }
+    public function listNearMiss(Request $request)
+    {
+        $pageSize = 2;
+        $query = employeeRecord::query();
+        if ($request->search) {
+            if ($request->employeeName) {
+                $query->where('employeeName', 'LIKE', "%$request->employeeName");
+            }
+            if ($request->department) {
+                $query->where('department', 'LIKE', "%$request->department");
+            }
+            if ($request->supervisorName) {
+                $query->where('supervisorName', 'LIKE', "%$request->supervisorName");
+            }
+        }
+        if ($request->sort) {
+            $query->sortable();
+        }
+        // if($request->sort) {
+        //     $sort = explode("-",$request->sort);
+        //      $query->orderBy($sort[0],$sort[1]);
+        // }else{
+        //     $query->orderBy('id','desc');
+        // }
+
+        if ($request->pagesize) {
+            $pageSize = $request->pagesize;
+        }
+        $find = $query->paginate($pageSize);
+        if ($request->ajax()) {
+            $returnHTML =view('admin.searchNearMiss', ['datas' => $find])->render();
+            return response()->json(['html' => $returnHTML]);
+        }
+        return view('admin.near_missTable', ['datas' => $find]);
     }
 }

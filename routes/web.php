@@ -37,14 +37,15 @@ Route::controller(AuthController::class)->group(function () {
 });
 Route::middleware(['auth'])->controller(DashboardController::class)->group(function () {
     Route::get('/admin', 'dashboard')->name('admin');
-    Route::get('near_missTable', 'listNearMiss')->name('near_missTable');
+    Route::get('/near_missTable', 'listNearMiss')->name('near_missTable');
     Route::get('/near_missTable/{id}', 'destroy')->name('near_miss_destroy');
-     Route::get('/near_missEdit/{id}', 'edit')->name('near_missEdit');
+    Route::get('/near_missEdit/{id}', 'edit')->name('near_missEdit');
+    // Route::get('/near_missSearch', 'nearMiss')->name('near_missSearch');
 });
 Route::controller(employeeRecordController::class)->group(function () {
     Route::get('/near-miss', 'register')->name('near-miss'); //for view jsa form
     Route::post('/near-miss', 'register')->name('near-miss.register'); //for submit jsa form data
-   
+
     // Route::get('/jsa-templates/{id}', 'destroy')->name('jsa-destroy');
     // Route::get('/generatePDF/{id}', 'generatePDF')->name('generatePDF');
     // Route::get('/export', 'export')->name('export');
