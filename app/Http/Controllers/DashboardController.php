@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use App\Models\employeeRecord;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -51,33 +52,31 @@ class DashboardController extends Controller
         $pageSize = 2;
         $query = employeeRecord::query();
         if ($request->search) {
+
             if ($request->employeeName) {
-                $query->where('employeeName', 'LIKE', "%$request->employeeName");
+                $query->where('employeeName', 'LIKE', "%$request->employeeName%");
             }
             if ($request->department) {
-                $query->where('department', 'LIKE', "%$request->department");
+                $query->where('department', 'LIKE', "%$request->department%");
             }
             if ($request->supervisorName) {
-                $query->where('supervisorName', 'LIKE', "%$request->supervisorName");
+                $query->where('supervisorName', 'LIKE', "%$request->supervisorName%");
             }
         }
-        if ($request->sort) {
-            $query->sortable();
+        if ($request->sort_type && $request->column_name){
+            $column_name = $request->column_name;
+            $sort_type = $request->sort_type;
+            $query->orderBy($column_name, $sort_type);
         }
-        // if($request->sort) {
-        //     $sort = explode("-",$request->sort);
-        //      $query->orderBy($sort[0],$sort[1]);
-        // }else{
-        //     $query->orderBy('id','desc');
-        // }
-
         if ($request->pagesize) {
             $pageSize = $request->pagesize;
         }
+    
         $find = $query->paginate($pageSize);
         if ($request->ajax()) {
-            $returnHTML =view('admin.searchNearMiss', ['datas' => $find])->render();
+            $returnHTML = view('admin.searchNearMiss', ['datas' => $find])->render();
             return response()->json(['html' => $returnHTML]);
+            return view('admin.near_missTable', ['datas' => $find]);
         }
         return view('admin.near_missTable', ['datas' => $find]);
     }

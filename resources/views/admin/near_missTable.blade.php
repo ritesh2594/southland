@@ -53,15 +53,18 @@
                                             <div class="form-row">
                                                 <div class="form-group col-md-4">
                                                     <label><b>Employee Name:</b></label>
-                                                    <input type="text" class="form-control" name="employeeName">
+                                                    <input type="text" class="form-control" name="employeeName"
+                                                        id="employeeName">
                                                 </div>
                                                 <div class="form-group col-md-4">
                                                     <label><b>Department:</b></label>
-                                                    <input type="text" class="form-control" name="department">
+                                                    <input type="text" class="form-control" name="department"
+                                                        id="department">
                                                 </div>
                                                 <div class="form-group col-md-4">
                                                     <label><b>Supervisor Name:</b></label>
-                                                    <input type="text" class="form-control" name="supervisorName">
+                                                    <input type="text" class="form-control" name="supervisorName"
+                                                        id="supervisorName">
                                                 </div>
                                             </div>
                                             <div class="text-right">
@@ -81,48 +84,12 @@
                         </div>
                     </div>
                     <div class="row mt-2">
-                        <section class="col-lg-12 connectedSortable">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Id</th>
-                                        <th scope="col">Employee Name</th>
-                                        <th scope="col">Employee Id</th>
-                                        <th scope="col">Department</th>
-                                        <th scope="col">Job Title</th>
-                                        <th scope="col">Supervisor Name</th>
-                                        <th scope="col">Date</th>
-                                        <th scope="col" class="text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="ajax-alert">
-                                    @foreach ($datas as $data)
-                                        <tr>
-                                            <th scope="row">{{ $data->id }}</th>
-                                            <td>{{ $data->employeeName }}</td>
-                                            <td>{{ $data->employeeId }}</td>
-                                            <td>{{ $data->department }}</td>
-                                            <td>{{ $data->jobTitle }}</td>
-                                            <td>{{ $data->supervisorName }}</td>
-                                            <td>{{ date('d-m-Y', strtotime($data->created_at)) }}</td>
-                                            <td class="text-center">
-                                                <a href="{{ route('near_missEdit', $data->id) }}"
-                                                    class="badge badge-primary"><i class='fas fa-edit'></i>
-                                                    Edit</a>
-                                                <a href="#" class="badge badge-success"><i
-                                                        class="far fa-file-pdf"></i> Export Pdf</a>
-                                                <a href="{{ route('near_miss_destroy', $data->id) }}"
-                                                    class="badge badge-danger delete"><i class='fas fa-trash-alt'></i>
-                                                    Delete</a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                            <div class="pagination">
-                                {!! $datas->appends(\Request::except('page'))->render() !!}
-                            </div>
+                        <section class="col-lg-12 connectedSortable" id="ajax-alert">
+                                    @include('admin.searchNearMiss')
                         </section>
+                        <input type="hidden" name="hidden_page" id="hidden_page" value="1" />
+                        <input type="hidden" name="hidden_column_name" id="hidden_column_name" value="id" />
+                        <input type="hidden" name="hidden_sort_type" id="hidden_sort_type" value="asc" />
                     </div>
                 </div>
             </section>
@@ -139,34 +106,106 @@
     });
 </script>
 <script>
-    $('#spinnerSearch').hide();
     $(document).ready(function() {
+        $('#spinnerSearch').hide();
+        var search = '';
+        var employeeName = '';
+        var department = '';
+        var supervisorName = '';
+        var column_name = '';
+        var sort_type = '';
+        var page = '';
+
+        function clear_icon() {
+            $('#id_icon').html('');
+            $('#employeeName_icon').html('');
+            $('#employeeId_icon').html('');
+            $('#department_icon').html('');
+            $('#jobTitle_icon').html('');
+            $('#supervisorName_icon').html('');
+            $('#created_at_icon').html('');
+        }
         $("#searchbtnMiss").click(function() {
-            var forms = $("#searchMiss");
-            var url = "{{ route('near_missTable') }}";
+            search = 'search';
+            employeeName = $('#employeeName').val().trim();
+            department = $('#department').val().trim();
+            supervisorName = $('#supervisorName').val().trim();
+            column_name = $('#hidden_column_name').val();
+            sort_type = $('#hidden_sort_type').val();
+            page = $('#hidden_page').val();
+            getSearch();
+        });
+
+        function getSearch() {
             $.ajax({
                 type: 'GET',
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                url: url,
-                data: forms.serialize(),
-                beforeSend: function() {
-                    $('#searchbtnMiss').addClass('disabled');
-                    $("#spinnerSearch").show();
+                url: "{{ route('near_missTable') }}",
+                data: {
+                    search: search,
+                    employeeName: employeeName,
+                    department: department,
+                    supervisorName: supervisorName,
+                    sort_type: sort_type,
+                    column_name: column_name,
+                    page: page
                 },
+                // beforeSend: function() {
+                //     $('#searchbtnMiss').addClass('disabled');
+                //     $("#spinnerSearch").show();
+                // },
                 success: function(data) {
                     if (data.html !== null) {
-                            $('#ajax-alert').empty();
-                            $('#ajax-alert').append(data.html);
-                        }
+                        $('#ajax-alert').empty();
+                        $('#ajax-alert').append(data.html);
+                    }
                 },
-                complete: function() {
-                    $('#searchbtnMiss').removeClass('disabled');
-                    $("#spinnerSearch").hide();
-                }
+                // complete: function() {
+                //     $('#searchbtnMiss').removeClass('disabled');
+                //     $("#spinnerSearch").hide();
+                // }
             });
+        }
+        $(document).on('click', '.sorting', function() {
+            var id = $(this).attr('id');
+            column_name = $(this).data('column_name');
+            sort_type = $(this).attr('data-sorting_type');
+            // $(this).attr('data-sorting_type', 'Undertaker');
+            // $(this).data('sorting_type', 'desc');
+            $('#hidden_column_name').val(column_name);
+            $('#hidden_sort_type').val(reverse_order);
+            page = $('#hidden_page').val();
+            search = $('#serach').val();
+            
+            var reverse_order = '';
+            if (sort_type == 'asc') {
+                $('#' + id).attr('data-sorting_type', 'desc');
+                reverse_order = 'desc';
+                clear_icon();
+                $('#' + column_name + '_icon').html(
+                    '<span class="fa fa-angle-up"></span>');
+            }
+            if (sort_type == 'desc') {
+                $('#' + id).attr('data-sorting_type', 'asc');
+                reverse_order = 'asc';
+                clear_icon();
+                $('#' + column_name + '_icon').html(
+                    '<span class="fa fa-angle-down"></span>');
+            }
+            getSearch();
         });
+
+        $(document).on('click', '.pagination a', function(event) {
+            event.preventDefault();
+            page = $(this).attr('href').split('page=')[1];
+            $('#hidden_page').val(page);
+            $('li').removeClass('active');
+            $(this).parent().addClass('active');
+            getSearch();
+        });
+
     });
 </script>
 
